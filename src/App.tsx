@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import RouterHomePage from "./pages/RouterHomePage";
+import RouterShopPage from "./pages/RouterShopPage";
+import RouterSportsPage from "./pages/RouterSportsPage";
+import RouterBlogPage from "./pages/RouterBlogPage";
+import NaviMenu from "./pages/NaviMenu";
+import BlogLayout from "./layousts/routerExample/BlogLayout";
+import RouterBlogChild01Page from "./pages/RouterBlogChild02Page";
+import RouterBlogChild02Page from "./pages/RouterBlogChild01Page";
+import RouterBlogChild03Page from "./pages/RouterBlogChild03Page";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ background: "lightblue" }}>
+      <BrowserRouter>
+        <NaviMenu />
+        <Routes>
+          <Route path="/" element={<RouterHomePage />} />
+          <Route path="/shop" element={<RouterShopPage />} />
+          <Route path="/sports" element={<RouterSportsPage />} />
+
+          <Route path="/blog" element={<BlogLayout />}>
+            <Route index element={<RouterBlogPage />} />
+            <Route path=":blogId" element={<RouterBlogPage />} />
+            <Route
+              path="test"
+              element={<RouterBlogPage title="테스트 타이틀" />}
+            />
+            <Route path="1" element={<RouterBlogChild01Page />} />
+            <Route path="2" element={<RouterBlogChild02Page />} />
+            <Route path="3" element={<RouterBlogChild03Page />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
 }
 
-export default App
+export default App;
