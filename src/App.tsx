@@ -1,40 +1,32 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
-import RouterHomePage from "./pages/RouterHomePage";
-import RouterShopPage from "./pages/RouterShopPage";
-import RouterSportsPage from "./pages/RouterSportsPage";
-import RouterBlogPage from "./pages/RouterBlogPage";
-import NaviMenu from "./pages/NaviMenu";
-import BlogLayout from "./layousts/routerExample/BlogLayout";
-import RouterBlogChild01Page from "./pages/RouterBlogChild02Page";
-import RouterBlogChild02Page from "./pages/RouterBlogChild01Page";
-import RouterBlogChild03Page from "./pages/RouterBlogChild03Page";
+import { useState } from "react";
+import Counter from "./components/Counter";
+
+export function getRandomHexColor() {
+  return `#${Math.floor(Math.random() * 0xffffff).toString(16)}`;
+}
 
 function App() {
+  const [count, setCount] = useState(0);
+  const [childCount, setChildCount] = useState(0);
+  const [show, setShow] = useState(false);
+
   return (
-    <div style={{ background: "lightblue" }}>
-      <BrowserRouter>
-        <NaviMenu />
-        <Routes>
-          <Route path="/" element={<RouterHomePage />} />
-          <Route path="/shop" element={<RouterShopPage />} />
-          <Route path="/sports" element={<RouterSportsPage />} />
+    <>
+      <div style={{ background: getRandomHexColor() }}>
+        <h1>count: {count}</h1>
+        <button onClick={() => setCount(count + 1)}>카운트 업</button>
+        <button onClick={() => setCount(count - 1)}>카운트 다운</button>
+      </div>
 
-          <Route path="/blog" element={<BlogLayout />}>
-            <Route index element={<RouterBlogPage />} />
-            <Route path=":blogId" element={<RouterBlogPage />} />
-            <Route
-              path="test"
-              element={<RouterBlogPage title="테스트 타이틀" />}
-            />
-            <Route path="1" element={<RouterBlogChild01Page />} />
-            <Route path="2" element={<RouterBlogChild02Page />} />
-            <Route path="3" element={<RouterBlogChild03Page />} />
-          </Route>
-
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+      <button onClick={() => setShow(!show)}>토클버튼</button>
+      {show && (
+        <Counter
+          title="01"
+          initValue={childCount}
+          onChanged={(v) => setChildCount(v)}
+        />
+      )}
+    </>
   );
 }
 
