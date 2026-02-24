@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import App_라우터연습back from "./App_라우터연습back.tsx";
 import App2 from "./App2.tsx";
+import App3 from "./App3.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -13,6 +14,9 @@ createRoot(document.getElementById("root")!).render(
     {/* <App /> */}
 
     {/* useState 심화 연습 */}
-    <App2 />
+    {/* <App2 /> */}
+
+    {/* useRef 연습 */}
+    <App3 />
   </StrictMode>
 );
