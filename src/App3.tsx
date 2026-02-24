@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Stopwatch from "./components/StopWatch";
+import DebounceSearch from "./components/DebounceSearch";
 
 // 함수 형식
 function usePreviousData<T>(data: T) {
@@ -45,7 +46,8 @@ const App3 = () => {
         버튼{count}
       </button>
 
-      <Stopwatch />
+      {/* <Stopwatch /> */}
+      <DebounceSearch />
     </div>
   );
 };
