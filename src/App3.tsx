@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Stopwatch from "./components/StopWatch";
 import DebounceSearch from "./components/DebounceSearch";
+import TodosPage from "./components/TodosPage";
 
 // 함수 형식
 function usePreviousData<T>(data: T) {
@@ -47,7 +48,8 @@ const App3 = () => {
       </button>
 
       {/* <Stopwatch /> */}
-      <DebounceSearch />
+      {/* <DebounceSearch /> */}
+      <TodosPage />
     </div>
   );
 };
