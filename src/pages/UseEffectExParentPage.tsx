@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UseEffectExChildPage from "./UseEffectExChildPage";
+import ChildTimerPage from "./useEffectTimer/ChildTimerPage";
 
 const UseEffectExParentPage = () => {
   const [count, setCount] = useState(0);
@@ -15,7 +16,8 @@ const UseEffectExParentPage = () => {
     <div>
       <h1>UseEffectExParentPage</h1>
       <div>
-        {showChild && <UseEffectExChildPage parentCount={count} />}
+        {/* {showChild && <UseEffectExChildPage parentCount={count} />} */}
+        {showChild && <ChildTimerPage />}
 
         <button onClick={() => setCount((prev) => prev + 1)}>
           부모 count Up: {count}
