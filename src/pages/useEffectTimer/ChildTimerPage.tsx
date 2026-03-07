@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getRandomHexColor } from "../../App";
 
-const ChildTimerPage = () => {
+const ChildTimerPage = ({ onFinish }: { onFinish: () => void }) => {
   const [count, setCount] = useState(5);
   const timerRef = useRef<number | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   // const countRef = useRef(0);
+
+  useEffect(() => {
+    if (count === 0 && isTimerRunning) {
+      setIsTimerRunning(false);
+      onFinish();
+    }
+  }, [count, isTimerRunning]);
 
   useEffect(() => {
     console.log("👏마운트 count: ", count);
@@ -24,7 +31,6 @@ const ChildTimerPage = () => {
           console.log("❌❌타이머 지움: ", timerRef.current);
           // countRef.current = 0;
           timerRef.current = null;
-          setIsTimerRunning(false);
           return 0;
         }
 

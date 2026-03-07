@@ -17,7 +17,7 @@ const UseEffectExParentPage = () => {
       <h1>UseEffectExParentPage</h1>
       <div>
         {/* {showChild && <UseEffectExChildPage parentCount={count} />} */}
-        {showChild && <ChildTimerPage />}
+        {showChild && <ChildTimerPage onFinish={() => setShowChild(false)} />}
 
         <button onClick={() => setCount((prev) => prev + 1)}>
           부모 count Up: {count}
