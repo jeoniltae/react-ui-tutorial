@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import UseEffectExChildPage from "./UseEffectExChildPage";
 import ChildTimerPage from "./useEffectTimer/ChildTimerPage";
+import UserActiveDetectPage from "./useEffectTimer/UserActiveDetectPage";
 
 const UseEffectExParentPage = () => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(3);
   const [showChild, setShowChild] = useState(false);
 
   useEffect(() => {
@@ -17,7 +18,8 @@ const UseEffectExParentPage = () => {
       <h1>UseEffectExParentPage</h1>
       <div>
         {/* {showChild && <UseEffectExChildPage parentCount={count} />} */}
-        {showChild && <ChildTimerPage onFinish={() => setShowChild(false)} />}
+        {/* {showChild && <ChildTimerPage onFinish={() => setShowChild(false)} />} */}
+        {showChild && <UserActiveDetectPage parentCount={count} />}
 
         <button onClick={() => setCount((prev) => prev + 1)}>
           부모 count Up: {count}
