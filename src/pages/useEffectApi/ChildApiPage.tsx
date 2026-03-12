@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getRandomHexColor } from "../../App";
 
 // API 참고: https://dummyjson.com
@@ -6,13 +6,27 @@ import { getRandomHexColor } from "../../App";
 const ChildApiPage = () => {
   const [dataTitle, setDataTitle] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [count, setCount] = useState(0); // useState - 랜더링 목적
+  const countRef = useRef(0); // useRef - 값의 참조 목적
+
+  const apiUrl = [
+    "https://dummyjson.com/products?delay=5000",
+    "https://dummyjson.com/recipes?delay=2000",
+  ];
 
   useEffect(() => {
     console.log("✅자식 마운트 됨");
 
+    let isApiFetching = true;
+
+    // if (countRef.current < 1) {
+    //   console.log("API호출 막음: ", countRef.current);
+    //   return;
+    // }
+
     setIsLoading(true); // 데이터 로딩중
 
-    fetch("https://dummyjson.com/products?delay=3000")
+    fetch(apiUrl[countRef.current])
       .then((res) => {
         console.log("✔응답 받아서 json으로 처리 - ", res);
 
@@ -26,7 +40,12 @@ const ChildApiPage = () => {
         console.log(data);
         const keys = Object.keys(data);
         console.log("🗝keys: ", keys);
-        setDataTitle(keys[0]);
+        if (isApiFetching) {
+          setDataTitle(keys[0]);
+          console.log("응답 데이터 반영🟢 - isApiFetching", isApiFetching);
+        } else {
+          console.log("응답 데이터 반영❌ - isApiFetching", isApiFetching);
+        }
       })
       .catch((err) => {
         console.error(`에러를 잡았다. ${err}`);
@@ -36,9 +55,10 @@ const ChildApiPage = () => {
       });
 
     return () => {
-      console.log("🗑언마운트 됨");
+      isApiFetching = false;
+      console.log("🗑언마운트 됨 - isApiFetching", isApiFetching);
     };
-  }, []);
+  }, [count]);
 
   console.log("🙋‍♂️자식 렌더링");
 
@@ -55,8 +75,67 @@ const ChildApiPage = () => {
           <p>{dataTitle}</p>
         </div>
       )}
+
+      <button
+        onClick={() =>
+          setCount((prev) => {
+            const result = prev + 1;
+            countRef.current = result;
+            return result;
+          })
+        }
+      >
+        API 호출 카운트: {count}
+      </button>
     </div>
   );
 };
 
 export default ChildApiPage;
+
+/**
+ * <isApiFetching 취소 플래그(cancel flag) 패턴 동작 원리를 단계별로 설명>
+ * 동작 원리
+ * 1. 클로저(Closure)를 활용한 플래그 변수
+ * isApiFetching은 useEffect 콜백 내부에 선언된 지역 변수입니다. 이 변수는 클로저에 의해 아래 두 곳에서 공유됩니다:
+ * .then() 콜백 (43번 라인) — 응답 데이터를 state에 반영할지 판단
+ * 클린업 함수 (57~60번 라인) — 언마운트/리렌더 시 플래그를 false로 변경
+ * 
+ * 2. 전체 흐름
+ * [마운트 / count 변경]
+    │
+    ▼
+useEffect 실행
+    │
+    ├─ isApiFetching = true  ← 플래그 활성화
+    │
+    ├─ fetch() 호출 (비동기 API 요청 시작)
+    │
+    ▼
+[언마운트 or count 재변경 발생 시]
+    │
+    ▼
+클린업 함수 실행
+    │
+    └─ isApiFetching = false  ← 플래그 비활성화
+    
+    ...그 사이 fetch 응답이 도착하면...
+    │
+    ▼
+.then() 에서 isApiFetching 확인
+    ├─ true  → setDataTitle() 호출 (데이터 반영 🟢)
+    └─ false → 무시 (데이터 반영 ❌)
+
+  * 3. 왜 필요한가? — Race Condition 방지
+      이 패턴이 없으면 다음과 같은 문제가 발생합니다:
+      사용자가 버튼을 눌러 count가 0 → 1로 변경
+      첫 번째 API 요청 (5초 딜레이) 이 아직 진행 중
+      두 번째 API 요청 (2초 딜레이) 이 새로 시작됨
+      두 번째 응답이 먼저 도착해서 setDataTitle("recipes") 적용
+      이후 첫 번째 응답이 늦게 도착해서 setDataTitle("products")로 덮어씀
+      결과적으로 사용자가 보는 데이터가 이전 요청의 결과로 덮어씌워지는 문제가 생깁니다.
+      isApiFetching 플래그 덕분에, count가 변경되면 이전 effect의 클린업이 먼저 실행되어 isApiFetching = false가 되고, 늦게 도착한 이전 응답은 43번 라인의 if (isApiFetching) 체크에서 걸려 state 업데이트가 무시됩니다.
+
+  * 4. 각 렌더마다 독립적인 플래그
+  useEffect 내부의 let이기 때문에, 렌더가 발생할 때마다 새로운 isApiFetching 변수가 생성됩니다. 이전 렌더의 클린업 함수는 이전 렌더의 isApiFetching을 참조하고, 새 렌더의 effect는 새로운 isApiFetching을 참조합니다. 이것이 클로저의 핵심입니다.
+ */
