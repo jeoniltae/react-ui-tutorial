@@ -5,13 +5,21 @@ type product = {
   title: string;
 };
 
+// 에러 타입을 리터럴로 정의하여 타입 위치와 값 위치로 사용
+// "타입은 값으로 사용 못한다"는 원칙은 맞습니다. 예를 들어 type Foo = string 같은 타입 별칭을 console.log(Foo)처럼 값으로 쓸 수는 없습니다. 하지만 문자열 리터럴('success')은 원래부터 JavaScript의 값이고, TypeScript가 타입 시스템에서도 이를 리터럴 타입으로 활용하는 것일 뿐입니다. 값이 먼저이고, 타입은 그 위에 얹어진 개념이라고 보시면 됩니다.
+type ApiStatus = "idle" | "loading" | "success" | "failure";
+
 const ChildApiAbort = () => {
   const [products, setProducts] = useState<product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errMessage, setErrMessage] = useState<string | null>(null);
+  const [apiStatus, setApiStatus] = useState<ApiStatus>("idle");
 
   useEffect(() => {
     console.log("자식 마운트");
+
+    // 로딩중
+    setApiStatus("loading");
 
     // 네트워크 취소를 위해 AbortController를 생성
     const abortController = new AbortController();
@@ -41,6 +49,7 @@ const ChildApiAbort = () => {
         console.log(products);
         console.log("==============");
         setProducts(products); // 👈 성공 응답 랜더링
+        setApiStatus("success");
       })
       .catch((err) => {
         if (err.name === "AbortError") {
@@ -48,6 +57,7 @@ const ChildApiAbort = () => {
         } else {
           console.error("err: ", err);
           setErrMessage(err.message);
+          setApiStatus("failure");
         }
       })
       .finally(() => {
@@ -67,9 +77,9 @@ const ChildApiAbort = () => {
   return (
     <div>
       <h1>ChildApiAbort</h1>
-      {isLoading ? (
-        <p>로딩중..</p>
-      ) : (
+      {apiStatus === "loading" && <p>로딩중..</p>}
+      {apiStatus === "failure" && errMessage && <p>{errMessage}</p>}
+      {apiStatus === "success" && (
         <ul>
           {products.map((v) => {
             return (
@@ -80,8 +90,6 @@ const ChildApiAbort = () => {
           })}
         </ul>
       )}
-
-      {errMessage && <p>{errMessage}</p>}
     </div>
   );
 };
