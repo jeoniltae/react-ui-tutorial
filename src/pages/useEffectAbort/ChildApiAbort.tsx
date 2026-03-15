@@ -7,6 +7,8 @@ type product = {
 
 const ChildApiAbort = () => {
   const [products, setProducts] = useState<product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errMessage, setErrMessage] = useState<string | null>(null);
 
   useEffect(() => {
     console.log("자식 마운트");
@@ -15,9 +17,15 @@ const ChildApiAbort = () => {
     const abortController = new AbortController();
     const signal = abortController.signal;
 
-    fetch("https://dummyjson.com/products?delay=2000", { signal: signal })
+    fetch("https://dummyjson.com/products?delay=1000", { signal: signal })
       .then((res) => {
         console.log("res: ", res);
+        const statusCode = res.status;
+
+        if (statusCode === 404) {
+          throw new Error("존재하지 않는 URL");
+        }
+
         return res.json();
       })
       .then((data) => {
@@ -39,10 +47,12 @@ const ChildApiAbort = () => {
           console.log("어볼트 에러");
         } else {
           console.error("err: ", err);
+          setErrMessage(err.message);
         }
       })
       .finally(() => {
         console.log("finally");
+        setIsLoading(false);
       });
 
     return () => {
@@ -57,15 +67,21 @@ const ChildApiAbort = () => {
   return (
     <div>
       <h1>ChildApiAbort</h1>
-      <ul>
-        {products.map((v) => {
-          return (
-            <li key={v.id}>
-              {v.id}. {v.title}
-            </li>
-          );
-        })}
-      </ul>
+      {isLoading ? (
+        <p>로딩중..</p>
+      ) : (
+        <ul>
+          {products.map((v) => {
+            return (
+              <li key={v.id}>
+                {v.id}. {v.title}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {errMessage && <p>{errMessage}</p>}
     </div>
   );
 };
