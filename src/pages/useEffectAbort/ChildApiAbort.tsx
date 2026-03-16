@@ -25,10 +25,17 @@ const ChildApiAbort = () => {
     const abortController = new AbortController();
     const signal = abortController.signal;
 
-    fetch("https://dummyjson.com/products?delay=1000", { signal: signal })
+    fetch("https://dummyjson.com/products?delay=7000", { signal: signal })
       .then((res) => {
         console.log("res: ", res);
         const statusCode = res.status;
+
+        if (statusCode === 400) {
+          return res.json().then((errBody) => {
+            const errMsg = errBody.message ?? "";
+            throw new Error(errMsg);
+          });
+        }
 
         if (statusCode === 404) {
           throw new Error("존재하지 않는 URL");
