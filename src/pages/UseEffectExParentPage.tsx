@@ -4,6 +4,7 @@ import ChildTimerPage from "./useEffectTimer/ChildTimerPage";
 import UserActiveDetectPage from "./useEffectTimer/UserActiveDetectPage";
 import ChildApiPage from "./useEffectApi/ChildApiPage";
 import ChildApiAbort from "./useEffectAbort/ChildApiAbort";
+import ChildAsyncAwaitApi from "./useEffectAsyncAwaitApi/ChildAsyncAwaitApi";
 
 const UseEffectExParentPage = () => {
   const [count, setCount] = useState(3);
@@ -23,7 +24,8 @@ const UseEffectExParentPage = () => {
         {/* {showChild && <ChildTimerPage onFinish={() => setShowChild(false)} />} */}
         {/* {showChild && <UserActiveDetectPage parentCount={count} />} */}
         {/* {showChild && <ChildApiPage />} */}
-        {showChild && <ChildApiAbort />}
+        {/* {showChild && <ChildApiAbort />} */}
+        {showChild && <ChildAsyncAwaitApi />}
 
         <button onClick={() => setCount((prev) => prev + 1)}>
           부모 count Up: {count}
