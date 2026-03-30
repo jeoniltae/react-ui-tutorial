@@ -105,3 +105,72 @@ export const useApi = <T = unknown>(
 
   return { data, isLoading, errMessage, apiStatus };
 };
+
+export const useRequsetApi = <T = unknown>(
+  request: (signal: AbortSignal) => Promise<T>
+  // handleResult: (json: any) => T
+): ApiResult<T> => {
+  // 성공 응답 데이터
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errMessage, setErrMessage] = useState<string | null>(null);
+  const [apiStatus, setApiStatus] = useState<ApiStatus>("idle");
+
+  useEffect(() => {
+    console.log("useApi useEffect");
+
+    // 로딩중
+    setApiStatus("loading");
+
+    // 네트워크 취소를 위해 AbortController를 생성
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const fetchData = async () => {
+      try {
+        const parsedData = await request(signal);
+        // const res = await fetch(url, {
+        //   signal: signal,
+        // });
+
+        console.log("res: ", parsedData);
+        
+
+        // 만약 data.products가 undefined이면 .map()을 호출할 수 없어서 에러가 납니다. ?? []로 빈 배열을 기본값으로 넣어주면 .map()이 에러 없이 빈 결과를 반환하게 됩니다.
+        // const productsData = data.products ?? [];
+        // const products = productsData.map((data: product) => {
+        //   return {
+        //     id: data.id,
+        //     title: data.title,
+        //   };
+        // });
+        console.log("==============");
+        console.log(parsedData);
+        console.log("==============");
+        setData(parsedData); // 👈 성공 응답 랜더링
+        setApiStatus("success");
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          console.log("어볼트 에러");
+        } else {
+          console.error("err: ", err);
+          setErrMessage(err.message);
+          setApiStatus("failure");
+        }
+      } finally {
+        console.log("finally");
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      // abortController.abort("자식 언마운트로 인해 네트워크 취소");
+      abortController.abort();
+      console.log("자식 언마운트");
+    };
+  }, []);
+
+  return { data, isLoading, errMessage, apiStatus };
+};

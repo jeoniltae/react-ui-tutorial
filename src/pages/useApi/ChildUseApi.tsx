@@ -1,6 +1,10 @@
 import { getRandomHexColor } from "../../App";
-import { useApi, type product, type todo } from "./useApi";
+import { fetchTodos } from "./apiRequest";
+import { useApi, useRequsetApi, type product, type todo } from "./useApi";
 
+// component - 화면
+// api 호출 커스텀 훅 - api - data, loading, error
+// api request 요청 - api 요청들..
 const ChildUseApi = () => {
   console.log("자식 컴포넌트 랜더링");
 
@@ -23,20 +27,21 @@ const ChildUseApi = () => {
       return products;
     }
   );
-  const { data: todos } = useApi<todo[]>(
-    "https://dummyjson.com/todos",
-    (json: any) => {
-      const todosData = json.todos ?? [];
-      // const todos = todosData.map((data: any) => {
-      //   return {
-      //     id: data.id,
-      //     title: data.title,
-      //   };
-      // });
+  // const { data: todos } = useApi<todo[]>(
+  //   "https://dummyjson.com/todos",
+  //   (json: any) => {
+  //     const todosData = json.todos ?? [];
+  //     // const todos = todosData.map((data: any) => {
+  //     //   return {
+  //     //     id: data.id,
+  //     //     title: data.title,
+  //     //   };
+  //     // });
 
-      return todosData;
-    }
-  );
+  //     return todosData;
+  //   }
+  // );
+  const { data: todos } = useRequsetApi<todo[]>(fetchTodos);
 
   return (
     <div
